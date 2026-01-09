@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DeciLog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="brand">DeciLog</div>
+        <nav class="nav">
+          <a href="{{ url_for('projects.projects_list') }}">Projects</a>
+          <a href="#">Decisions</a>
+          <a href="#">Tasks</a>
+          <a href="#">Minutes</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

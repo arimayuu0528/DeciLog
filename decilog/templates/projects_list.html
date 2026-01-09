@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h1>Projects</h1>
+
+  <section class="card">
+    <h2>New Project</h2>
+    <form method="post" action="{{ url_for('projects.projects_create') }}">
+      <div class="field">
+        <label>Name (required)</label>
+        <input type="text" name="name" placeholder="例：学内コンテスト チーム制作" required />
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <input type="text" name="description" placeholder="任意：概要や目的" />
+      </div>
+      <button class="btn" type="submit">Create</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>List</h2>
+
+    {% if projects|length == 0 %}
+      <p class="muted">まだプロジェクトがありません。</p>
+    {% else %}
+      <ul class="list">
+        {% for p in projects %}
+          <li class="list-item">
+            <div class="title">{{ p["name"] }}</div>
+            <div class="muted">{{ p["description"] or "" }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% endblock %}

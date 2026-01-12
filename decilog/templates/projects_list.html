@@ -1,5 +1,6 @@
+{# extends: このテンプレは layout.html（親テンプレ）を土台として使う #}
 {% extends "layout.html" %}
-
+{#  block content: layout.html にある「contentという差し込み口」に、この中身が入る #}
 {% block content %}
   <h1>Projects</h1>
 
@@ -27,7 +28,11 @@
       <ul class="list">
         {% for p in projects %}
           <li class="list-item">
-            <div class="title">{{ p["name"] }}</div>
+            <div class="title">
+              <a href="{{ url_for('projects.projects_detail', project_id=p['id']) }}">
+                {{ p["name"] }}
+              </a>
+            </div>
             <div class="muted">{{ p["description"] or "" }}</div>
           </li>
         {% endfor %}

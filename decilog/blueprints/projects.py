@@ -38,3 +38,37 @@ def projects_create():
     con.close()        # DB接続を閉じる
 
     return redirect(url_for("projects.projects_list")) # 作成後に一覧へ戻す
+
+@projects_bp.route("/<int:project_id>", methods=["GET"], strict_slashes=False)  # GET /projects/<id>（末尾スラッシュ有無も許可）
+def projects_detail(project_id):  # 指定されたproject_idのプロジェクト詳細を表示する
+    sql = "SELECT id, name, description FROM projects WHERE id = %s;"  # 1件取得用SQL（%sはプレースホルダ）
+    con = connect_db()                                                 # MySQLへ接続してコネクションを取得する
+    cur = con.cursor(dictionary=True)                                  # 結果を辞書形式で受け取れるカーソルを作る（列名で参照できる）
+    cur.execute(sql, (project_id,))                                    # project_idをSQLに渡してSELECTを実行する（タプルなので末尾カンマ必須）
+    project = cur.fetchone()                                           # 取得結果を1件だけ取り出す（該当なしならNone）
+    cur.close()                                                        # カーソルを閉じる（後片付け）
+    con.close()                                                        # DB接続を閉じる（後片付け）
+
+    if project is None:  # 該当IDのプロジェクトが存在しない場合
+        # とりあえず一覧へ戻す（本番は404ページでもOK）＝ いったん安全に一覧へ逃がす（後で404実装でも良い）
+        return redirect(url_for("projects.projects_list"))  # プロジェクト一覧へリダイレクトする
+
+    return render_template("project_detail.html", project=project)  # 詳細テンプレへprojectを渡して表示する
+
+@projects_bp.route("/<int:project_id>/edit", methods=["POST"], strict_slashes=False)  # POST /projects/<id>/edit で更新を受け付ける
+def projects_update(project_id):  # 指定されたproject_idのプロジェクト情報を更新する
+    name = (request.form.get("name") or "").strip()                # フォームからnameを取得し、未入力は空文字にして前後空白を除去する
+    description = (request.form.get("description") or "").strip()  # フォームからdescriptionを取得し、前後空白を除去する
+
+    if not name:  # nameが空なら（必須チェック）
+        return redirect(url_for("projects.projects_detail", project_id=project_id))  # 詳細画面へ戻して入力をやり直す
+
+    sql = "UPDATE projects SET name = %s, description = %s WHERE id = %s;"  # UPDATE文（対象IDのname/descriptionを更新）
+    con = connect_db()  # MySQLへ接続してコネクションを取得する
+    cur = con.cursor()  # UPDATEなので通常カーソルで十分（dictionary不要）
+    cur.execute(sql, (name, description if description else None, project_id))  # 空descriptionはNULLとして更新し、対象IDを指定する
+    con.commit() # 変更を確定する（コミット）
+    cur.close()  # カーソルを閉じる（後片付け）
+    con.close()  # DB接続を閉じる（後片付け）
+
+    return redirect(url_for("projects.projects_detail", project_id=project_id))  # 更新後に詳細画面へ戻して結果を確認できるようにする

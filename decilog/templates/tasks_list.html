@@ -1,0 +1,53 @@
+{# extends: このテンプレは layout.html（親テンプレ）を土台として使う #}
+{% extends "layout.html" %}
+{# block content: layout.html にある「contentという差し込み口」に、この中身が入る #}
+{% block content %}
+  <h1>Tasks</h1>
+
+  <section class="card">
+    <h2>New Task</h2>
+    <form method="post" action="{{ url_for('tasks.tasks_create') }}">
+      <div class="field">
+        <label>Project ID</label>
+        <input type="number" name="project_id" required />
+      </div>
+      <div class="field">
+        <label>Title</label>
+        <input type="text" name="title" required />
+      </div>
+      <div class="field">
+        <label>Assignee</label>
+        <input type="text" name="assignee" />
+      </div>
+      <div class="field">
+        <label>Due date</label>
+        <input type="date" name="due_date" />
+      </div>
+      <button class="btn" type="submit">Create</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>List</h2>
+    {% if tasks|length == 0 %}
+      <p class="muted">まだタスクがありません。</p>
+    {% else %}
+      <ul class="list">
+        {% for t in tasks %}
+          <li class="list-item">
+            <div class="title">{{ t["title"] }} ({{ t["status"] }})</div>
+            <form method="post" action="{{ url_for('tasks.tasks_update_status', task_id=t['id']) }}">
+              <select name="status">
+                <option value="todo"  {% if t["status"]=="todo" %}selected{% endif %}>todo</option>
+                <option value="doing" {% if t["status"]=="doing" %}selected{% endif %}>doing</option>
+                <option value="done"  {% if t["status"]=="done" %}selected{% endif %}>done</option>
+              </select>
+              <button class="btn" type="submit">更新</button>
+            </form>
+            <div class="muted">Project: {{ t["project_name"] }} / Due: {{ t["due_date"] or "" }} / Assignee: {{ t["assignee"] or "" }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% endblock %}

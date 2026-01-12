@@ -1,0 +1,28 @@
+{# extends: このテンプレは layout.html（親テンプレ）を土台として使う #}
+{% extends "layout.html" %}
+{#  block content: layout.html にある「contentという差し込み口」に、この中身が入る #}
+{% block content %}
+  <h1>Project Detail</h1>
+
+  <section class="card">
+    <h2>{{ project["name"] }}</h2>
+    <p class="muted">{{ project["description"] or "" }}</p>
+  </section>
+
+  <section class="card">
+    <h2>Edit</h2>
+    <form method="post" action="{{ url_for('projects.projects_update', project_id=project['id']) }}">
+      <div class="field">
+        <label>Name</label>
+        <input type="text" name="name" value="{{ project['name'] }}" required />
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <input type="text" name="description" value="{{ project['description'] or '' }}" />
+      </div>
+      <button class="btn" type="submit">Update</button>
+    </form>
+  </section>
+
+  <p><a href="{{ url_for('projects.projects_list') }}">← Back</a></p>
+{% endblock %}
